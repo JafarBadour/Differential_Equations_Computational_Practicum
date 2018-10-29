@@ -197,6 +197,19 @@ def getMax(XX,YY,opt):
         ans = max(ans, abs(YY[i] - fx(XX[i],opt)))
     return ans
 
+def getMaxErr(opt):
+    YY = []
+    XX = []
+    for i in range(10, 1000, 10):
+        opt.num_seg = i
+        X1, Y1 = approx_method(opt)
+        n = len(Y1)
+        for j in range(0, n):
+            Y1[j] = abs(Y1[j] - (1 - getD(opt) * math.exp(X1[j])) * (1 - getD(opt) * math.exp(X1[j])))
+        YY.append(max(Y1))
+        XX.append(i)
+    return XX, YY
+
 
 def draw_max_error_graph(opt):
     draw_window = Tk()
@@ -206,17 +219,7 @@ def draw_max_error_graph(opt):
     previous_value = opt.num_seg
     ax = f.add_subplot(111)
     Mx_errors = []
-    YY = []
-    XX = []
-    for i in range(10,1000,10):
-        opt.num_seg = i
-        X1, Y1 = approx_method(opt)
-        n = len(Y1)
-        for j in range(0,n):
-            Y1[j] = abs(Y1[j] -(1-getD(opt)*math.exp(X1[j]))*(1-getD(opt)*math.exp(X1[j])))
-        YY.append(max(Y1))
-        XX.append(i)
-
+    XX, YY = getMaxErr(opt)
     ax.plot(XX, YY)
    # plt.plot(X, Mx_errors)
     opt.num_seg = previous_value
@@ -227,17 +230,17 @@ def draw_max_error_graph(opt):
 
 def draw_all_error_graph(opt):
     draw_window = Tk()
-    draw_window.title("all  error graph, Euler Green, Improved Euler Orange, RungeKutta blue")
+    draw_window.title("all  error graph, Euler blue, Improved Euler Orange, RungeKutta green")
     f = Figure()
     opt.option = "Euler";
     ax = f.add_subplot(111)
-    X1,Y1 = approx_method(opt)
+    X1, Y1 = getMaxErr(opt)
     ax.plot(X1,Y1)
     opt.option = "Improved Euler"
-    X1,Y1 = approx_method(opt)
+    X1, Y1 = getMaxErr(opt)
     ax.plot(X1,Y1)
     opt.option = "RungeKutta"
-    X1,Y1 = approx_method(opt)
+    X1, Y1 = getMaxErr(opt)
     ax.plot(X1,Y1)
     canvas = FigureCanvasTkAgg(f, draw_window)
     canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
