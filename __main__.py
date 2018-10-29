@@ -33,15 +33,19 @@ class DrawOpt:
         self.num_seg = int(event)
 
 def getD(opt):
-    sq = math.sqrt(opt.INITIAL_Y)
-    xs = math.exp(opt.INITIAL_X*opt.INITIAL_X/4.0)
-    return -sq/(-sq*xs+xs)
+    rt = math.sqrt(opt.INITIAL_Y)
+    d = (- rt + 1)/math.exp(opt.INITIAL_X)
+    d2 = (rt + 1)/math.exp(opt.INITIAL_X)
+    if d>0 and  d2 > 0:
+        assert(0)
+    else:
+        return max(d,d2)
 
 def exact_sol(X, opt):
+    D = getD(opt)
+    return np.square(1-D*np.exp(X))
 
-    return np.square(1-2*np.exp(X))
-
-
+# كسمك ياكارفالو
 def f(x, y):
     return 2 * math.sqrt(y) + 2 * y
 
@@ -214,11 +218,11 @@ options = DrawOpt()
 button = Button(root, text="draw graphs", command=lambda: draw_graph(options))
 button.place(anchor="center", x=300, y=250)
 
-button_error = Button(root, text="draw error graph", command=lambda: draw_error_graph(options))
-button_error.place(anchor="center", x=300, y=275)
+#button_error = Button(root, text="draw error graph", command=lambda: draw_error_graph(options))
+#button_error.place(anchor="center", x=300, y=275)
 
-button_mx_error = Button(root, text="draw max error", command=lambda: draw_max_error_graph(options))
-button_mx_error.place(anchor="center", x=300, y=300)
+#button_mx_error = Button(root, text="draw max error", command=lambda: draw_max_error_graph(options))
+#button_mx_error.place(anchor="center", x=300, y=300)
 
 method_list_box = Listbox(root, height=5, width=15, selectmode=SINGLE)
 methods = ["Euler's method", "Improved Euler's method", "Runge-Kutta method"]
