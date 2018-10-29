@@ -45,7 +45,7 @@ def exact_sol(X, opt):
     D = getD(opt)
     return np.square(1-D*np.exp(X))
 
-# كسمك ياكارفالو
+#
 def f(x, y):
     return 2 * math.sqrt(y) + 2 * y
 
@@ -217,12 +217,6 @@ options = DrawOpt()
 
 button = Button(root, text="draw graphs", command=lambda: draw_graph(options))
 button.place(anchor="center", x=300, y=250)
-
-#button_error = Button(root, text="draw error graph", command=lambda: draw_error_graph(options))
-#button_error.place(anchor="center", x=300, y=275)
-
-#button_mx_error = Button(root, text="draw max error", command=lambda: draw_max_error_graph(options))
-#button_mx_error.place(anchor="center", x=300, y=300)
 
 method_list_box = Listbox(root, height=5, width=15, selectmode=SINGLE)
 methods = ["Euler's method", "Improved Euler's method", "Runge-Kutta method"]
