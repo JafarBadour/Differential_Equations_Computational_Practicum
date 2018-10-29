@@ -45,7 +45,13 @@ def exact_sol(X, opt):
     D = getD(opt)
     return np.square(1-D*np.exp(X))
 
-#
+
+def fx(x,opt):
+    D = getD(opt)
+
+    return (1-D*math.exp(x))*(1-D*math.exp(x))
+
+
 def f(x, y):
     return 2 * math.sqrt(y) + 2 * y
 
@@ -89,7 +95,7 @@ def Eulers(opt):
         x_cur += h
 
     Y = np.array(Y)
-    plt.plot(X, Y)
+    #plt.plot(X, Y)
     return X, Y
 
 
@@ -185,6 +191,12 @@ def draw_error_graph(opt):
     canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
     draw_window.mainloop()
 
+def getMax(XX,YY,opt):
+    ans = 0
+    for i in range(0,len(XX)):
+        ans = max(ans, abs(YY[i] - fx(XX[i],opt)))
+    return ans
+
 
 def draw_max_error_graph(opt):
     draw_window = Tk()
@@ -194,20 +206,43 @@ def draw_max_error_graph(opt):
     previous_value = opt.num_seg
     ax = f.add_subplot(111)
     Mx_errors = []
-    for steps in range(MIN_STEPS, MAX_STEPS + 1):
-        opt.num_seg = steps
+    YY = []
+    XX = []
+    for i in range(10,1000,10):
+        opt.num_seg = i
         X1, Y1 = approx_method(opt)
-        Y = exact_sol(X1, opt)
-        E = np.abs(Y1 - Y)
-        max_error = np.amax(E)
-        Mx_errors.append(max_error)
-    X = np.linspace(MIN_STEPS, MAX_STEPS, MAX_STEPS - MIN_STEPS + 1)
-    Mx_errors = np.array(Mx_errors)
-    ax.plot(X, Mx_errors)
+        n = len(Y1)
+        for j in range(0,n):
+            Y1[j] = abs(Y1[j] -(1-getD(opt)*math.exp(X1[j]))*(1-getD(opt)*math.exp(X1[j])))
+        YY.append(max(Y1))
+        XX.append(i)
+
+    ax.plot(XX, YY)
+   # plt.plot(X, Mx_errors)
     opt.num_seg = previous_value
     canvas = FigureCanvasTkAgg(f, draw_window)
     canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
     draw_window.mainloop()
+
+
+def draw_all_error_graph(opt):
+    draw_window = Tk()
+    draw_window.title("all  error graph, Euler Green, Improved Euler Orange, RungeKutta blue")
+    f = Figure()
+    opt.option = "Euler";
+    ax = f.add_subplot(111)
+    X1,Y1 = approx_method(opt)
+    ax.plot(X1,Y1)
+    opt.option = "Improved Euler"
+    X1,Y1 = approx_method(opt)
+    ax.plot(X1,Y1)
+    opt.option = "RungeKutta"
+    X1,Y1 = approx_method(opt)
+    ax.plot(X1,Y1)
+    canvas = FigureCanvasTkAgg(f, draw_window)
+    canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+    draw_window.mainloop()
+
 
 
 root = Tk()
@@ -217,6 +252,18 @@ options = DrawOpt()
 
 button = Button(root, text="draw graphs", command=lambda: draw_graph(options))
 button.place(anchor="center", x=300, y=250)
+
+
+button_error = Button(root,text="draw error graph", command=lambda:draw_error_graph(options))
+button_error.place(anchor="center",x=300,y=275)
+
+button_mx_error = Button(root,text="draw max error",command=lambda:draw_max_error_graph(options))
+button_mx_error.place(anchor="center",x=300,y=300)
+
+
+button_mx_error = Button(root,text="draw all errors",command=lambda:draw_all_error_graph(options))
+button_mx_error.place(anchor="center",x=300,y=350)
+
 
 method_list_box = Listbox(root, height=5, width=15, selectmode=SINGLE)
 methods = ["Euler's method", "Improved Euler's method", "Runge-Kutta method"]
