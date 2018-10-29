@@ -1,5 +1,5 @@
 import matplotlib
-
+import matplotlib.pyplot as plt
 matplotlib.use("tkagg")
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -8,9 +8,9 @@ from tkinter import *
 import math
 from tkinter import messagebox as tkMessageBox
 
-MIN_STEPS = 10
-MAX_STEPS = 1000
-UPPER_BOUND = 2.4
+MIN_STEPS = 100
+MAX_STEPS = 10000
+UPPER_BOUND = 9
 X0_POSITION_X = 100
 X0_POSITION_Y = 100
 Y0_POSITION_X = 100
@@ -32,14 +32,18 @@ class DrawOpt:
     def update_num_seg(self, event):
         self.num_seg = int(event)
 
+def getD(opt):
+    sq = math.sqrt(opt.INITIAL_Y)
+    xs = math.exp(opt.INITIAL_X*opt.INITIAL_X/4.0)
+    return -sq/(-sq*xs+xs)
 
 def exact_sol(X, opt):
-    return -(np.sin(X) + np.cos(X)) / 2 + np.exp(X - opt.INITIAL_X) * (
-                opt.INITIAL_Y + (np.sin(opt.INITIAL_X) + np.cos(opt.INITIAL_X)) / 2)
+
+    return np.square(1-2*np.exp(X))
 
 
 def f(x, y):
-    return math.sin(x) + y
+    return 2 * math.sqrt(y) + 2 * y
 
 
 def approx_method(opt):  # returns two parameters:
@@ -76,9 +80,12 @@ def Eulers(opt):
     h = (UPPER_BOUND - opt.INITIAL_X) / (opt.num_seg)
     for i in range(opt.num_seg):
         y_cur = y_cur + h * f(x_cur, y_cur)
+        #g = f(x_cur, y_cur)
         Y.append(y_cur)
         x_cur += h
+
     Y = np.array(Y)
+    plt.plot(X, Y)
     return X, Y
 
 
@@ -123,10 +130,10 @@ def draw_graph(opt):
         opt.INITIAL_X = float(box_x.get())
         opt.INITIAL_Y = float(box_y.get())
     except:
-        opt.INITIAL_X = 0
-        opt.INITIAL_Y = 1
-        box_x.insert(END, '0')
-        box_y.insert(END, '1')
+        opt.INITIAL_X = 1
+        opt.INITIAL_Y = 4
+        box_x.insert(END, '1')
+        box_y.insert(END, '4')
     opt.INITIAL_X = min(opt.INITIAL_X, UPPER_BOUND)
     draw_window = Tk()
     f = Figure()
@@ -153,8 +160,8 @@ def draw_error_graph(opt):
         opt.INITIAL_X = float(box_x.get())
         opt.INITIAL_Y = float(box_y.get())
     except:
-        opt.INITIAL_X = 0
-        opt.INITIAL_Y = 1
+        opt.INITIAL_X = 1
+        opt.INITIAL_Y = 3
     opt.INITIAL_X = min(opt.INITIAL_X, UPPER_BOUND)
     draw_window = Tk()
     f = Figure()
@@ -201,7 +208,7 @@ def draw_max_error_graph(opt):
 
 root = Tk()
 root.minsize(600, 600)
-root.maxsize(600, 600)
+root.maxsize(1200, 1200)
 options = DrawOpt()
 
 button = Button(root, text="draw graphs", command=lambda: draw_graph(options))
@@ -240,9 +247,6 @@ label_y.place(x=Y0_POSITION_X - 70, y=Y0_POSITION_Y)
 label_num = Label(root, text="number of steps:")
 label_num.place(x=X0_POSITION_X - 100, y=X0_POSITION_Y - 30)
 
-label_title = Label(root, text="y' = y + sin(x)")
+label_title = Label(root, text="y' = 2y^(1/2) + 2y")
 label_title.place(x=300, y=10, anchor="center")
 root.mainloop()
-
-
-
