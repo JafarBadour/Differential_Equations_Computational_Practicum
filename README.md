@@ -6,4 +6,4 @@ type on cmd
 ```
 python __main__.py
 ```
-you should have python, tki
+you should have python, Matplotlib, numpy, tkinter.
